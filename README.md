@@ -6,7 +6,19 @@
 - 버전: 0.2.1
 - 라이선스: [AiGrid 무료 배포 라이선스](LICENSE.md). 상업적 이용을 포함해 무료로 쓸 수 있으며, AiGrid 자체를 유료로 판매하는 것은 금지됩니다.
 
-> **English summary.** AiGrid is a browser data grid with editing, change tracking, validation, sorting, filtering, grouping, virtual scrolling, and CSV/Excel export. Use it with plain `<script>` tags or the bundled React component. Free for personal and commercial use under the [AiGrid Freeware License](LICENSE.md); selling AiGrid itself is not permitted.
+> **English summary.** AiGrid is a browser data grid with editing, change tracking, validation, sorting, filtering, grouping, virtual scrolling, and CSV/Excel export. Use it with plain `<script>` tags or the bundled React component. Free for personal and commercial use under the [AiGrid Freeware License](LICENSE.md); selling AiGrid itself is not permitted. Live examples: https://rubyon.azurewebsites.net/software/aigrid
+
+## 실행 예제 사이트
+
+설치 없이 브라우저에서 바로 실행해 볼 수 있습니다.
+
+| 페이지 | 주소 |
+|---|---|
+| AiGrid 소개 | https://rubyon.azurewebsites.net/software/aigrid |
+| JavaScript 예제 모음(Sample Explorer) | https://rubyon.azurewebsites.net/sample/example.html |
+| Sample Code Kit | https://rubyon.azurewebsites.net/sample-kit/index.html |
+
+사이트에는 이 배포판에 포함되지 않은 기능(차트, 스프레드시트, AI 페이지 빌더, 서버 연동)의 예제도 함께 있습니다.
 
 ## 구성
 
