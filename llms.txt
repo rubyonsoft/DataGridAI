@@ -1,0 +1,33 @@
+# AiGrid
+
+> AiGrid is a browser JavaScript data grid (editable data table, spreadsheet-like grid) for plain JavaScript and React. It provides cell editing with 12 column types, change tracking, validation, undo/redo, Excel-compatible copy and paste, sorting, filtering, grouping, tree grid, summary rows, client and server paging, virtual scrolling for 500,000+ rows, and CSV/Excel import and export. Version 0.2.1, freeware: free for personal and commercial use; selling AiGrid itself is not permitted.
+
+Key facts:
+
+- Load `dist/aigrid-core.min.css` and `dist/aigrid-core.min.js`, then call `await AiGrid.createGrid({ mount, columns, dataSource, features })`.
+- React: `import { AiGridReact } from "aigrid/react"` after `import "aigrid/core.css"; import "aigrid/core";`. Install with `npm install github:rubyonsoft/DataGridAI#v0.2.1`.
+- Column types: rowno, row-check, text, multitext, number, date, check, radio, combo-master, combo-detail, template (DOM node renderer), button.
+- Change tracking: `getChanges()` returns `{ inserted, updated: [{ row, dirtyFields }], deleted }`; `acceptChanges()` / `rejectChanges()`.
+- Validation: column `validation: { required, pattern, min, max, custom }`, `validateAll()`.
+- Data sources: local arrays, JSON URLs, server mode GET queries (`offset`, `limit`, `sort`, `filters`, `filterMode`), NDJSON, custom async `transport`.
+- Cell values are always rendered as text (no HTML injection); structured cells use `cellTemplate` returning DOM nodes.
+- Excel features require SheetJS (`window.XLSX`). Not included: charts, spreadsheet formulas, AI page builder.
+
+## Docs
+
+- [README](https://github.com/rubyonsoft/DataGridAI/blob/main/README.md): Overview, quick start for JavaScript and React, license summary
+- [Features](https://github.com/rubyonsoft/DataGridAI/blob/main/docs/FEATURES.md): Every feature with option and method names (Korean, with an English summary)
+- [API reference](https://github.com/rubyonsoft/DataGridAI/blob/main/docs/API.md): createGrid options, feature flags and defaults, column properties, instance methods, events, React props
+- [TypeScript types](https://github.com/rubyonsoft/DataGridAI/blob/main/dist/react/aigridTypes.d.ts): AiGridOptions, AiGridColumn, AiGridInstance, AiGridEventMap
+
+## Examples
+
+- [Live JavaScript examples](https://rubyon.azurewebsites.net/sample/example.html): 37 samples with editable code (column types, sort and filter, caption menu, grouping, tree, large data, server mode)
+- [Live React examples](https://rubyon.azurewebsites.net/sample/react/index.html): Employee CRUD with validation and save, Column Types, Sort & Filter, Caption Menu, Grid Resize, Large Data Grid (500,000 rows)
+- [Product page](https://rubyon.azurewebsites.net/software/aigrid): AiGrid introduction
+
+## Optional
+
+- [License](https://github.com/rubyonsoft/DataGridAI/blob/main/LICENSE.md): AiGrid Freeware License v1.0 (Korean and English)
+- [Third-party notices](https://github.com/rubyonsoft/DataGridAI/blob/main/THIRD-PARTY-NOTICES.md): Bundled open-source components
+- [Changelog](https://github.com/rubyonsoft/DataGridAI/blob/main/CHANGELOG.md)

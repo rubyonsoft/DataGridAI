@@ -21,6 +21,46 @@
 
 사이트에는 이 배포판에 포함되지 않은 기능(차트, 스프레드시트, AI 페이지 빌더, 서버 연동)의 예제도 함께 있습니다.
 
+## 주요 기능
+
+| 분류 | 기능 |
+|---|---|
+| 데이터 연결 | 로컬 배열, JSON URL, 서버 모드(정렬·필터·페이지를 GET 쿼리로 전달), NDJSON, 사용자 정의 비동기 `transport` |
+| 열 타입 (12종) | 행 번호, 행 선택 체크박스, 텍스트, 멀티텍스트, 숫자, 날짜, 체크, 라디오, 마스터·디테일 연동 콤보, 템플릿(DOM 렌더러), 버튼 |
+| 편집 | 더블클릭·Enter 편집, 행 추가·삭제, 실행 취소·다시 실행(Ctrl+Z/Y), 툴바 버튼 |
+| 변경 추적 | 행별 추가·수정·삭제 상태와 바뀐 필드, `getChanges()` / `acceptChanges()` / `rejectChanges()` |
+| 입력 검증 | `required`, `pattern`, `min`, `max`, 사용자 정의 규칙, `validateAll()`, 오류 셀 표시 |
+| 선택·클립보드 | 셀 범위·다중 범위 선택, 행 선택 모드, Excel과 호환되는 복사·잘라내기·붙여넣기(TSV), 오른쪽 클릭 메뉴 |
+| 정렬·필터 | 머리글 정렬, Shift+클릭 다중 정렬, 20여 가지 필터 연산자, AND/OR, 툴바 필터와 행 필터 |
+| 열 관리 | 열 머리글 메뉴(숨기기·보이기·고정), 열 너비 조절, 화면 폭 맞춤, 고정 열, 다단 머리글 |
+| 레이아웃 | 고정 머리글·바닥글·행, 셀 병합, 조건부 스타일, 툴팁, 테마 3종 |
+| 그룹·트리·요약 | 끌어 놓기 그룹, 그룹 요약, 트리 그리드와 자식 지연 로드, 합계·평균·최소·최대·개수 요약 행 |
+| 대량 데이터 | 가상 스크롤, 클라이언트·서버 페이징, 50만 행 예제 |
+| 가져오기·내보내기 | CSV 가져오기·내보내기, Excel 가져오기·내보내기(SheetJS), 행·셀 수 제한과 수식 정책을 둔 안전한 Excel 읽기 |
+| 상태 | 상태 저장·복원(localStorage), 열·정렬·필터 상태 JSON, 키 기반 데이터 교체와 선택 |
+| 키보드·접근성 | 방향키·Tab 이동, 한글 IME 입력 안전, 그리드별 키 입력 분리, `role="grid"`와 ARIA 속성 |
+| 보안 | 셀 값을 항상 텍스트로 표시(HTML 주입 방지), DOM 노드 기반 사용자 렌더러 |
+| React | `AiGridReact` 컴포넌트, TypeScript 타입, StrictMode 안전, `rows` 동기화, 이벤트 prop |
+
+기능별 옵션·메서드 이름은 [docs/FEATURES.md](docs/FEATURES.md), 전체 API는 [docs/API.md](docs/API.md)에 있습니다.
+
+## Features (English)
+
+- **Data binding:** local arrays, JSON URLs, server-side mode (sort, filter and paging sent as GET query), NDJSON streams, custom async transport
+- **12 column types:** row number, row checkbox, text, multiline text, number, date, checkbox, radio, cascading master/detail combo, template (DOM node renderer), button
+- **Editing:** in-cell editing, insert/delete rows, undo/redo, toolbar actions, **change tracking** (inserted/updated/deleted with dirty fields), **validation** (required, pattern, min, max, custom)
+- **Selection and clipboard:** cell ranges, multi-range, row selection, Excel-compatible copy/cut/paste (TSV), context menu
+- **Sorting and filtering:** multi-column sort, 20+ filter operators, AND/OR, filter panel and filter row
+- **Columns and layout:** column menu (hide/show/pin), resize, fit to width, frozen columns, header groups, sticky header/footer/rows, cell merge, conditional styling, tooltips, 3 themes
+- **Grouping, tree, summary:** drag-and-drop grouping with group summaries, tree grid with lazy-loaded children, sum/avg/min/max/count summary rows
+- **Performance:** virtual scrolling, client and server paging, 500,000-row example
+- **Import/export:** CSV, Excel (SheetJS), safe Excel parsing with limits and formula policy
+- **State:** save/restore grid state, column/sort/filter state as JSON, key-based row replace and selection APIs
+- **Accessibility and security:** keyboard navigation, IME-safe editing, ARIA roles, text-only cell rendering (no HTML injection)
+- **React:** `AiGridReact` component with TypeScript types, StrictMode-safe lifecycle, controlled `rows` sync and event props
+
+See [docs/FEATURES.md](docs/FEATURES.md) and [docs/API.md](docs/API.md). An LLM-friendly summary is in [llms.txt](llms.txt).
+
 ## 구성
 
 | 경로 | 내용 |
@@ -29,6 +69,8 @@
 | `dist/react/` | React 컴포넌트 `AiGridReact`(ES 모듈)와 TypeScript 타입 |
 | `examples/javascript/` | 프레임워크 없이 쓰는 예제 모음(Sample Explorer)과 빠른 시작 페이지 |
 | `examples/react/` | React 예제(직원 관리, Column Types, Sort & Filter, Caption Menu, Grid Resize, Large Data Grid) |
+| `docs/FEATURES.md`, `docs/API.md` | 기능 설명서와 API 레퍼런스 |
+| `llms.txt` | AI 도구용 요약 |
 | `THIRD-PARTY-NOTICES.md` | 포함된 오픈소스 구성 요소의 고지 |
 
 ## 예제 실행
