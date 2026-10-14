@@ -16,6 +16,7 @@
 |---|---|
 | AiGrid 소개 | https://rubyon.azurewebsites.net/software/aigrid |
 | JavaScript 예제 모음(Sample Explorer) | https://rubyon.azurewebsites.net/sample/example.html |
+| React 예제 | https://rubyon.azurewebsites.net/sample/react/index.html |
 | Sample Code Kit | https://rubyon.azurewebsites.net/sample-kit/index.html |
 
 사이트에는 이 배포판에 포함되지 않은 기능(차트, 스프레드시트, AI 페이지 빌더, 서버 연동)의 예제도 함께 있습니다.
