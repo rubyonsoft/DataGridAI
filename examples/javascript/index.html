@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AiGrid Sample Explorer (JavaScript)</title>
+    <link rel="stylesheet" href="../../dist/aigrid-core.min.css">
+    <link rel="stylesheet" href="./assets/column-types-sample.css?v=20260822r2">
+    <style>
+        body.example-full-page-sample .workbench.code-collapsed {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        body.example-full-page-sample .workbench.code-collapsed .code-panel {
+            display: none;
+        }
+
+        body.example-full-page-sample .result-panel {
+            min-height: calc(100vh - 148px);
+        }
+
+        body.example-full-page-sample .result-body {
+            min-height: calc(100vh - 210px);
+        }
+
+        body.example-full-page-sample .result-host,
+        body.example-full-page-sample #gridMount {
+            min-height: calc(100vh - 230px);
+        }
+
+        .full-page-notes {
+            display: none;
+            margin: 10px 12px 0;
+            padding: 10px 12px;
+            border: 1px solid #d7deea;
+            border-radius: 12px;
+            background: #f8fbff;
+            color: #43546b;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        body.example-full-page-sample .full-page-notes {
+            display: block;
+        }
+
+        .full-page-notes ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="api-layout">
+        <aside class="sidebar">
+            <div class="sidebar-head">
+                <p class="brand">AiGrid</p>
+                <div class="tab-row">
+                    <button type="button" class="active" onclick="window.location.href='./index.html'">JavaScript</button>
+                    <button type="button" onclick="window.location.href='../react/index.html'">React</button>
+                </div>
+            </div>
+            <div class="search-wrap">
+                <input id="sampleSearch" type="search" placeholder="Type at least 2 characters">
+            </div>
+            <div class="menu-actions">
+                <button id="sampleExpandAll" type="button" aria-label="Open all menu groups" title="Open all menu groups">
+                    <span aria-hidden="true">▾</span>
+                </button>
+                <button id="sampleCollapseAll" type="button" aria-label="Close all menu groups" title="Close all menu groups">
+                    <span aria-hidden="true">▸</span>
+                </button>
+            </div>
+            <section class="mvp-menu" aria-label="MVP feature shortcuts">
+                <div class="mvp-menu__head">
+                    <strong>MVP Features</strong>
+                    <span>Core paths</span>
+                </div>
+                <div class="mvp-menu__items" id="mvpNav"></div>
+            </section>
+            <div class="menu-wrap" id="sampleNav"></div>
+        </aside>
+
+        <main class="content">
+            <header class="content-head">
+                <h1 id="sampleTitle">Example Samples</h1>
+                <p id="sampleSubtitle">Custom sample registry and extension playground</p>
+            </header>
+
+            <section class="workbench code-collapsed">
+                <div class="panel code-panel">
+                    <section class="description description-inline">
+                        <ul id="sampleNotes"></ul>
+                    </section>
+                    <div class="panel-head">
+                        <div class="left-actions">
+                            <button type="button" class="code-tab active" data-tab="js">JavaScript</button>
+                            <button type="button" class="code-tab" data-tab="html">Html</button>
+                            <button type="button" class="code-tab" data-tab="page">Full Page</button>
+                        </div>
+                        <div class="right-actions">
+                            <button id="copyPage" type="button">Copy Full Page</button>
+                            <button id="resetSample" type="button">Reset</button>
+                            <button id="runSample" type="button" class="run">Run</button>
+                        </div>
+                    </div>
+                    <textarea id="codeJs" class="code-editor" spellcheck="false" aria-label="JavaScript editor"></textarea>
+                    <textarea id="codeHtml" class="code-editor hidden" spellcheck="false" aria-label="HTML editor"></textarea>
+                    <textarea id="codePage" class="code-editor hidden" spellcheck="false" aria-label="Standalone HTML editor"></textarea>
+                </div>
+
+                <div class="panel result-panel">
+                    <div class="panel-head">
+                        <h3>Result</h3>
+                        <div class="result-actions">
+                            <button id="toggleCodePanel" type="button">Show Code</button>
+                            <span class="result-status" id="resultStatus">Ready</span>
+                        </div>
+                    </div>
+                    <section id="sampleFullPageNotes" class="full-page-notes" aria-live="polite"></section>
+                    <div class="result-body">
+                        <div class="result-host">
+                            <div id="gridMount"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div style="display:none">
+        <button id="findInvalidBtn" class="aigrid-toolbar-btn valid-search" onclick="window.fnFindInvalid()">오류 찾기</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <script>
+        window.fnRedirect = function(link) {
+            location.href = link;
+        };
+
+
+
+        window.fnFindInvalid = function() {
+            if (!datagrid) return;
+            var focus = datagrid.getFocus();
+            var prevR = focus ? focus.rowIndex : -1;
+            var prevC = focus ? focus.column : null;
+            
+            var invalid = datagrid.findInvalid(prevR, prevC);
+            if (invalid) {
+                datagrid.moveFocusEx(invalid.rowIndex, invalid.column);
+                datagrid.setStatus("Invalid cell found: row " + (invalid.rowIndex + 1) + ", col " + invalid.column);
+            } else {
+                alert("더 이상 오류 셀이 없습니다.");
+            }
+        };
+
+        if (!window.XLSX) {
+            document.write('<script src="./assets/vendor/xlsx/xlsx.full.min.js?v=20260421r1"><\\/script>');
+        }
+    </script>
+    <style>
+        .sunday { color: #fa5252 !important; font-weight: bold; }
+        .saturday { color: #228be6 !important; font-weight: bold; }
+        
+        /* Premium Calendar Styles */
+        .calendar-cell { padding: 8px; height: 100%; display: flex; flex-direction: column; text-align: left; }
+        .calendar-cell .date { font-size: 15px; font-weight: 700; color: #343a40; margin-bottom: 6px; }
+        .calendar-cell .schedules { flex: 1; overflow-y: hidden; display: flex; flex-direction: column; gap: 4px; }
+        .calendar-cell .schedule { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            background: rgba(248, 249, 250, 0.8); 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            border-left: 3px solid #dee2e6;
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .calendar-cell .schedule .time { color: #868e96; font-weight: 600; min-width: 32px; }
+        .calendar-cell .schedule .event { color: #495057; text-overflow: ellipsis; overflow: hidden; }
+        
+        /* Status colored items */
+        .calendar-cell .schedule.important { border-left-color: #fa5252; background: #fff5f5; }
+        .calendar-cell .schedule.important .event { color: #c92a2a; }
+        .calendar-cell .schedule.work { border-left-color: #228be6; background: #e7f5ff; }
+        .calendar-cell .schedule.work .event { color: #1864ab; }
+
+        .add-num { margin-top: 4px; font-size: 11px; color: #adb5bd; text-align: right; padding-right: 4px; font-weight: 600; }
+        .add-num span { background: #f1f3f5; padding: 1px 6px; border-radius: 10px; }
+
+        .calendar-popup-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.42);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 2000;
+        }
+        .calendar-popup-backdrop[hidden] { display: none; }
+        .calendar-popup {
+            width: min(440px, calc(100vw - 40px));
+            max-height: min(560px, calc(100vh - 40px));
+            overflow: auto;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            border-radius: 20px;
+            box-shadow: 0 28px 60px rgba(15, 23, 42, 0.24);
+            color: #1e293b;
+        }
+        .calendar-popup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 20px 12px;
+        }
+        .calendar-popup-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .calendar-popup-subtitle {
+            margin: 4px 0 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+        .calendar-popup-close {
+            width: 34px;
+            height: 34px;
+            border: 0;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: #334155;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+        }
+        .calendar-popup-body {
+            padding: 0 20px 20px;
+        }
+        .calendar-popup-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .calendar-popup-item {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 12px;
+            align-items: start;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: #ffffff;
+            border-left: 4px solid #cbd5e1;
+            box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.95);
+        }
+        .calendar-popup-item.important {
+            border-left-color: #ef4444;
+            background: #fff5f5;
+        }
+        .calendar-popup-item.work {
+            border-left-color: #3b82f6;
+            background: #eff6ff;
+        }
+        .calendar-popup-time {
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            padding-top: 2px;
+        }
+        .calendar-popup-event {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .calendar-popup-type {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #64748b;
+        }
+        .json-popup-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 2100;
+        }
+        .json-popup-backdrop[hidden] { display: none; }
+        .json-popup {
+            width: min(820px, calc(100vw - 48px));
+            max-height: min(720px, calc(100vh - 48px));
+            display: flex;
+            flex-direction: column;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 18px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 28px 60px rgba(15, 23, 42, 0.32);
+            overflow: hidden;
+        }
+        .json-popup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 18px 12px;
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.96) 0%, rgba(15, 23, 42, 0.98) 100%);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        }
+        .json-popup-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+        .json-popup-subtitle {
+            margin: 4px 0 0;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .json-popup-close {
+            width: 34px;
+            height: 34px;
+            border: 0;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.18);
+            color: #f8fafc;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+        }
+        .json-popup-body {
+            padding: 0;
+            overflow: auto;
+            background: #020617;
+        }
+        .json-popup-pre {
+            margin: 0;
+            padding: 18px 20px 22px;
+            font: 12px/1.6 Consolas, "Courier New", monospace;
+            color: #cbd5e1;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    </style>
+
+    <!-- Calendar Template -->
+    <script id="dayCellTemplate" type="text/template">
+        <div class="calendar-cell">
+            <div class="date">{{this}}</div>
+            <div class="schedules">
+               {{@for this-schedule limit=2}}
+                  <div class="schedule {{type}}">
+                    <span class="time">{{time}}</span>
+                    <span class="event">{{title}}</span>
+                  </div>
+               {{/@for}}
+               {{@ifMore this-schedule 2}}
+                  <div class="add-num">
+                      <span>+{{@countMore this-schedule 2}}</span>
+                  </div>
+               {{/@ifMore}}
+            </div>
+        </div>
+    </script>
+    <!-- Flag Template -->
+    <script id="flagCellTemplate" type="text/template">
+        <div style="text-align:center">
+            <img src="{{flagUrl}}" class="cell-flag" alt="flag">
+        </div>
+    </script>
+
+    <script src="../../dist/aigrid-core.min.js"></script>
+    <script>
+        (function () {
+            var popupElements = null;
+            var jsonPopupElements = null;
+
+            function ensureCalendarPopup() {
+                if (popupElements) {
+                    return popupElements;
+                }
+
+                var backdrop = document.createElement("div");
+                backdrop.className = "calendar-popup-backdrop";
+                backdrop.hidden = true;
+                backdrop.innerHTML =
+                    '<div class="calendar-popup" role="dialog" aria-modal="true" aria-labelledby="calendarPopupTitle" tabindex="-1">'
+                    + '  <div class="calendar-popup-header">'
+                    + '    <div>'
+                    + '      <h3 id="calendarPopupTitle" class="calendar-popup-title"></h3>'
+                    + '      <p class="calendar-popup-subtitle">선택한 날짜의 일정 목록입니다.</p>'
+                    + '    </div>'
+                    + '    <button type="button" class="calendar-popup-close" aria-label="Close">×</button>'
+                    + '  </div>'
+                    + '  <div class="calendar-popup-body">'
+                    + '    <ul class="calendar-popup-list"></ul>'
+                    + '  </div>'
+                    + '</div>';
+
+                document.body.appendChild(backdrop);
+
+                var dialog = backdrop.querySelector(".calendar-popup");
+                var titleEl = backdrop.querySelector(".calendar-popup-title");
+                var listEl = backdrop.querySelector(".calendar-popup-list");
+                var closeBtn = backdrop.querySelector(".calendar-popup-close");
+
+                function close() {
+                    backdrop.hidden = true;
+                    document.body.style.removeProperty("overflow");
+                }
+
+                backdrop.addEventListener("click", function (event) {
+                    if (event.target === backdrop) {
+                        close();
+                    }
+                });
+
+                closeBtn.addEventListener("click", close);
+
+                document.addEventListener("keydown", function (event) {
+                    if (!backdrop.hidden && event.key === "Escape") {
+                        close();
+                    }
+                });
+
+                popupElements = {
+                    backdrop: backdrop,
+                    dialog: dialog,
+                    titleEl: titleEl,
+                    listEl: listEl,
+                    close: close
+                };
+
+                return popupElements;
+            }
+
+            function ensureJsonPopup() {
+                if (jsonPopupElements) {
+                    return jsonPopupElements;
+                }
+
+                var backdrop = document.createElement("div");
+                backdrop.className = "json-popup-backdrop";
+                backdrop.hidden = true;
+                backdrop.innerHTML =
+                    '<div class="json-popup" role="dialog" aria-modal="true" aria-labelledby="jsonPopupTitle" tabindex="-1">'
+                    + '  <div class="json-popup-header">'
+                    + '    <div>'
+                    + '      <h3 id="jsonPopupTitle" class="json-popup-title"></h3>'
+                    + '      <p class="json-popup-subtitle"></p>'
+                    + '    </div>'
+                    + '    <button type="button" class="json-popup-close" aria-label="Close">×</button>'
+                    + '  </div>'
+                    + '  <div class="json-popup-body">'
+                    + '    <pre class="json-popup-pre"></pre>'
+                    + '  </div>'
+                    + '</div>';
+
+                document.body.appendChild(backdrop);
+
+                var dialog = backdrop.querySelector(".json-popup");
+                var titleEl = backdrop.querySelector(".json-popup-title");
+                var subtitleEl = backdrop.querySelector(".json-popup-subtitle");
+                var preEl = backdrop.querySelector(".json-popup-pre");
+                var closeBtn = backdrop.querySelector(".json-popup-close");
+
+                function close() {
+                    backdrop.hidden = true;
+                    document.body.style.removeProperty("overflow");
+                }
+
+                backdrop.addEventListener("click", function (event) {
+                    if (event.target === backdrop) close();
+                });
+
+                closeBtn.addEventListener("click", close);
+
+                document.addEventListener("keydown", function (event) {
+                    if (!backdrop.hidden && event.key === "Escape") close();
+                });
+
+                jsonPopupElements = {
+                    backdrop: backdrop,
+                    dialog: dialog,
+                    titleEl: titleEl,
+                    subtitleEl: subtitleEl,
+                    preEl: preEl,
+                    close: close
+                };
+
+                return jsonPopupElements;
+            }
+
+            function escapeHtml(value) {
+                return String(value == null ? "" : value)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+            }
+
+            window.showCalendarSchedulePopup = function (dayLabel, schedules) {
+                if (!schedules || !schedules.length) {
+                    return;
+                }
+
+                var popup = ensureCalendarPopup();
+                popup.titleEl.textContent = dayLabel + "일 일정";
+                popup.listEl.innerHTML = schedules.map(function (item) {
+                    var type = item && item.type ? String(item.type) : "";
+                    var typeLabel = type === "important" ? "중요 일정" : type === "work" ? "업무 일정" : "일정";
+                    var time = escapeHtml(item && item.time ? String(item.time) : "-");
+                    var title = escapeHtml(item && item.title ? String(item.title) : "");
+                    var safeTypeLabel = escapeHtml(typeLabel);
+                    return ''
+                        + '<li class="calendar-popup-item ' + type + '">'
+                        + '  <div class="calendar-popup-time">' + time + '</div>'
+                        + '  <div>'
+                        + '    <div class="calendar-popup-event">' + title + '</div>'
+                        + '    <div class="calendar-popup-type">' + safeTypeLabel + '</div>'
+                        + '  </div>'
+                        + '</li>';
+                }).join("");
+
+                popup.backdrop.hidden = false;
+                document.body.style.overflow = "hidden";
+                window.setTimeout(function () {
+                    popup.dialog.focus && popup.dialog.focus();
+                }, 0);
+            };
+
+            window.showJsonPopup = function (title, data, subtitle) {
+                var popup = ensureJsonPopup();
+                popup.titleEl.textContent = title || "JSON Preview";
+                popup.subtitleEl.textContent = subtitle || "변경된 데이터를 JSON으로 확인합니다.";
+                popup.preEl.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+                popup.backdrop.hidden = false;
+                document.body.style.overflow = "hidden";
+                window.setTimeout(function () {
+                    popup.dialog.focus && popup.dialog.focus();
+                }, 0);
+            };
+        })();
+    </script>
+    <script src="./assets/example-sample-registry.js?v=20260510r3"></script>
+    <script>
+        // Freeware build: chart (ECharts), Jspreadsheet and server-dependent AI samples are not included.
+        (function () {
+            var config = window.AiGridSampleHostConfig || {};
+            var excludedGroups = ["차트","Jspreadsheet","AI"];
+            config.appendSamples = (config.appendSamples || []).filter(function (sample) {
+                return excludedGroups.indexOf(sample.group) < 0;
+            });
+            config.localApiOnly = true;
+            config.coreCssUrl = "aigrid-core.min.css";
+            config.coreJsUrl = "aigrid-core.min.js";
+            window.AiGridSampleHostConfig = config;
+        })();
+    </script>
+    <script src="./assets/column-types-sample.js?v=20260727r3"></script>
+</body>
+</html>

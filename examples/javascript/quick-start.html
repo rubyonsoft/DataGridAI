@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AiGrid 빠른 시작</title>
+  <link rel="stylesheet" href="../../dist/aigrid-core.min.css">
+  <style>
+    html, body { margin: 0; background: #f3f6fb; font-family: "Segoe UI", "Malgun Gothic", "Noto Sans KR", sans-serif; }
+    main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    h1 { margin: 0 0 4px; font-size: 20px; }
+    p { margin: 0 0 12px; color: #5e6f8a; font-size: 13px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .actions button { min-height: 32px; padding: 4px 12px; border: 1px solid #c9d3e3; border-radius: 6px; background: #fff; font: inherit; font-size: 13px; cursor: pointer; }
+    #gridMount { min-height: 320px; }
+    pre { margin: 12px 0 0; padding: 12px; border: 1px solid #dce2ef; border-radius: 8px; background: #fff; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AiGrid 빠른 시작</h1>
+    <p>로컬 배열을 표시하고 편집합니다. 셀을 더블클릭하거나 Enter로 편집하고, 변경 확인으로 getChanges() 결과를 봅니다.</p>
+    <div class="actions">
+      <button type="button" id="addRow">행 추가</button>
+      <button type="button" id="validate">검증</button>
+      <button type="button" id="showChanges">변경 확인</button>
+      <button type="button" id="exportCsv">CSV 내보내기</button>
+    </div>
+    <div id="gridMount"></div>
+    <pre id="output">변경 확인을 누르면 getChanges() 결과가 표시됩니다.</pre>
+  </main>
+
+  <script src="../../dist/aigrid-core.min.js"></script>
+  <script>
+    (async function () {
+      var output = document.getElementById("output");
+      var rows = [
+        { id: 1, team: "Platform", owner: "Kim", progress: 72, startDate: "2026-04-01" },
+        { id: 2, team: "AI", owner: "Lee", progress: 48, startDate: "2026-04-03" },
+        { id: 3, team: "QA", owner: "Park", progress: 91, startDate: "2026-03-28" },
+        { id: 4, team: "Ops", owner: "Choi", progress: 33, startDate: "2026-04-10" }
+      ];
+
+      var grid = await AiGrid.createGrid({
+        mount: "#gridMount",
+        title: "프로젝트 현황",
+        toolbarText: "로컬 데이터",
+        rowKey: "id",
+        dataSource: rows,
+        features: { editing: true, sorting: true, filtering: true, columnResize: true, stickyHeader: true, undoRedo: true, rowDrag: false },
+        columns: [
+          { key: "rowno", title: "#", type: "rowno", width: 60, readOnly: true },
+          { key: "id", title: "ID", type: "number", width: 80, readOnly: true },
+          { key: "team", title: "팀", type: "text", width: 150, validation: { required: true, messageRequired: "팀은 필수입니다." } },
+          { key: "owner", title: "담당자", type: "text", width: 120 },
+          { key: "progress", title: "진행률", type: "number", width: 110, align: "right", validation: { min: 0, max: 100 } },
+          { key: "startDate", title: "시작일", type: "date", width: 130 }
+        ]
+      });
+
+      document.getElementById("addRow").addEventListener("click", function () {
+        var nextId = Math.max.apply(null, grid.getDataRows().map(function (row) { return Number(row.id) || 0; })) + 1;
+        var index = grid.insertRow(undefined, { id: nextId, team: "", owner: "", progress: 0, startDate: "" });
+        grid.moveFocusEx(index, "team");
+      });
+
+      document.getElementById("validate").addEventListener("click", function () {
+        var errors = grid.validateAll();
+        output.textContent = errors.length ? JSON.stringify(errors, null, 2) : "검증 오류가 없습니다.";
+        if (errors.length) grid.moveFocusEx(errors[0].row, errors[0].key);
+      });
+
+      document.getElementById("showChanges").addEventListener("click", function () {
+        output.textContent = JSON.stringify(grid.getChanges({ includeDeleted: true }), null, 2);
+      });
+
+      document.getElementById("exportCsv").addEventListener("click", function () {
+        grid.exportToCsv({ filename: "projects.csv", includeBom: true });
+      });
+
+      window.addEventListener("pagehide", function () { grid.destroy(); }, { once: true });
+    })().catch(function (error) {
+      console.error("AiGrid 초기화 실패", error);
+      document.getElementById("gridMount").textContent = "그리드를 불러오지 못했습니다.";
+    });
+  </script>
+</body>
+</html>

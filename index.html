@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AiGrid 0.2.1</title>
+  <style>
+    html, body { margin: 0; background: #f3f6fb; color: #1f2a3d; font-family: "Segoe UI", "Malgun Gothic", "Noto Sans KR", sans-serif; }
+    main { max-width: 860px; margin: 0 auto; padding: 32px 16px; }
+    h1 { margin: 0; font-size: 28px; }
+    .lead { margin: 8px 0 24px; color: #5e6f8a; line-height: 1.6; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    a.card { display: block; padding: 16px; border: 1px solid #dce2ef; border-radius: 10px; background: #fff; color: inherit; text-decoration: none; }
+    a.card:hover, a.card:focus-visible { border-color: #2f6fde; outline: none; }
+    a.card strong { display: block; margin-bottom: 6px; font-size: 16px; }
+    a.card span { color: #5e6f8a; font-size: 13px; line-height: 1.5; }
+    footer { margin-top: 32px; color: #5e6f8a; font-size: 12px; line-height: 1.6; }
+    footer a { color: #2f6fde; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AiGrid 0.2.1</h1>
+    <p class="lead">브라우저 데이터 그리드 무료 배포판입니다. 편집, 변경 추적, 검증, 정렬·필터·그룹, 가상 스크롤, CSV/Excel 내보내기를 제공합니다.</p>
+    <div class="cards">
+      <a class="card" href="examples/javascript/index.html">
+        <strong>JavaScript 예제 모음</strong>
+        <span>프레임워크 없이 script 태그로 쓰는 기능별 예제와 코드</span>
+      </a>
+      <a class="card" href="examples/javascript/quick-start.html">
+        <strong>빠른 시작</strong>
+        <span>로컬 배열, 편집, 검증, 변경 확인을 담은 최소 예제</span>
+      </a>
+      <a class="card" href="examples/react/index.html">
+        <strong>React 예제</strong>
+        <span>AiGridReact로 편집, 검증, 저장, 서버 데이터 재동기화</span>
+      </a>
+    </div>
+    <footer>
+      <a href="LICENSE.md">AiGrid 무료 배포 라이선스</a> · <a href="THIRD-PARTY-NOTICES.md">제3자 고지</a><br>
+      Copyright (c) 2026 루비온소프트
+    </footer>
+  </main>
+</body>
+</html>

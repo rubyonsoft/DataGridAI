@@ -1,0 +1,34 @@
+{
+  "name": "aigrid",
+  "version": "0.2.1",
+  "description": "AiGrid browser data grid (freeware): runtime and React component",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "private": true,
+  "author": "Rubyonsoft",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rubyonsoft/DataGridAI.git"
+  },
+  "sideEffects": [
+    "./dist/aigrid-core.min.js",
+    "*.css"
+  ],
+  "exports": {
+    "./core": "./dist/aigrid-core.min.js",
+    "./core.css": "./dist/aigrid-core.min.css",
+    "./react": {
+      "types": "./dist/react/aigrid.d.ts",
+      "import": "./dist/react/aigrid-react.mjs"
+    },
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}
