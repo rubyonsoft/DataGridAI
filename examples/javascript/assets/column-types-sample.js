@@ -22,6 +22,7 @@
     var toggleCodePanelBtn = document.getElementById("toggleCodePanel");
     var mvpSampleIds = [
         "example-ai-page-builder",
+        "example-react-aigrid",
         "caption-menu",
         "large-data",
         "example-chart-intraday-breaks-grid"
@@ -2997,7 +2998,8 @@
     }
 
     function renderInfo(sample) {
-        var isFullPageSample = sample.group === "AI";
+        // Embedded page samples use the whole result area without the code panel.
+        var isFullPageSample = sample.group === "AI" || sample.group === "React";
         document.body.classList.toggle("example-full-page-sample", isFullPageSample);
         title.textContent = sample.title;
         subtitle.textContent = sample.subtitle;

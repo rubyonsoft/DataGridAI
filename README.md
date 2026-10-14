@@ -28,7 +28,7 @@
 | `dist/aigrid-core.min.js`, `dist/aigrid-core.min.css` | 그리드 런타임(`window.AiGrid`) |
 | `dist/react/` | React 컴포넌트 `AiGridReact`(ES 모듈)와 TypeScript 타입 |
 | `examples/javascript/` | 프레임워크 없이 쓰는 예제 모음(Sample Explorer)과 빠른 시작 페이지 |
-| `examples/react/` | React 예제(편집 → 검증 → 저장 → 서버 데이터 재동기화) |
+| `examples/react/` | React 예제(직원 관리, Column Types, Sort & Filter, Caption Menu, Grid Resize, Large Data Grid) |
 | `THIRD-PARTY-NOTICES.md` | 포함된 오픈소스 구성 요소의 고지 |
 
 ## 예제 실행
@@ -42,7 +42,7 @@ python -m http.server 8080
 
 - `examples/javascript/quick-start.html`은 파일을 더블클릭해서 열어도 동작합니다.
 - React 예제는 ES 모듈을 쓰므로 `file://`로 열면 동작하지 않습니다. 정적 서버나 GitHub Pages로 여세요.
-- GitHub Pages를 저장소 루트로 켜면 https://rubyonsoft.github.io/DataGridAI/ 에서 바로 볼 수 있습니다.
+- 직접 공개하려면 이 폴더를 정적 웹 서버나 GitHub Pages(저장소 루트)로 올리면 됩니다.
 
 ## 빠른 시작: JavaScript
 

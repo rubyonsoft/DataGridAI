@@ -249,6 +249,38 @@
                     }
                 },
                 {
+                    id: "example-react-aigrid",
+                    group: "React",
+                    name: "React 예제 (AiGridReact)",
+                    title: "React 예제 - AiGridReact",
+                    subtitle: "React 상태와 연결한 편집, 검증, 저장, 서버 데이터 재동기화",
+                    notes: [
+                        "AiGridReact 컴포넌트로 React 상태의 행을 그리드에 연결합니다.",
+                        "rowKey가 있으면 새 rows를 replaceRows로 제자리 반영하고, 저장하지 않은 편집은 덮어쓰지 않습니다.",
+                        "저장 흐름: validateAll() → getChanges() → 서버 저장 → acceptChanges() → 서버 결과를 rows로 전달."
+                    ],
+                    code: [
+                        "return null;",
+                        "// This explorer entry embeds the React example page in an iframe.",
+                        "// Open /sample/react/index.html directly for the full page."
+                    ],
+                    defaultHtml: [
+                        "<div style=\"display:grid;grid-template-rows:auto 1fr;gap:10px;height:100%;min-height:640px;\">",
+                        "  <div style=\"display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:12px 14px;border:1px solid #d7deea;border-radius:12px;background:#f8fbff;\">",
+                        "    <div>",
+                        "      <div style=\"font-weight:700;color:#17324d;\">React 예제 - AiGridReact</div>",
+                        "      <div style=\"font-size:12px;color:#60758f;margin-top:4px;\">셀을 더블클릭해 편집하고 저장, 변경 취소, 서버 데이터 다시 받기를 눌러 보세요.</div>",
+                        "    </div>",
+                        "    <a href=\"/sample/react/index.html\" target=\"_blank\" rel=\"noopener\" style=\"display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border-radius:10px;background:#2563eb;color:#fff;text-decoration:none;font-weight:600;\">새 창으로 열기</a>",
+                        "  </div>",
+                        "  <iframe src=\"/sample/react/index.html\" title=\"AiGrid React 예제\" style=\"width:100%;height:100%;min-height:560px;border:1px solid #d7deea;border-radius:12px;background:#fff;\"></iframe>",
+                        "</div>"
+                    ].join("\n"),
+                    defaultJs: [
+                        "return null;"
+                    ]
+                },
+                {
                     id: "example-chart-line-grid",
                     group: "차트",
                     name: "Line + Grid",
