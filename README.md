@@ -4,7 +4,7 @@
 프레임워크 없이 `<script>` 태그로 쓰거나, 포함된 React 컴포넌트로 쓸 수 있습니다.
 
 - 버전: 0.2.2
-- 라이선스: [AiGrid 무료 배포 라이선스](LICENSE.md). 상업적 이용을 포함해 무료로 쓸 수 있으며, AiGrid 자체를 유료로 판매하는 것은 금지됩니다.
+- 라이선스: [AiGrid 무료 배포 라이선스](LICENSE.md). 상업적 이용을 포함해 무료로 쓸 수 있으며, AiGrid를 포함한 제품으로 판매 할 수 있으나 AiGrid 자체만 유료로 판매하는 것은 금지됩니다.
 
 > **English summary.** AiGrid is a browser data grid with editing, change tracking, validation, sorting, filtering, grouping, virtual scrolling, and CSV/Excel export. Use it with plain `<script>` tags or the bundled React component. Free for personal and commercial use under the [AiGrid Freeware License](LICENSE.md); selling AiGrid itself is not permitted. Live examples: https://rubyon.azurewebsites.net/software/aigrid
 
