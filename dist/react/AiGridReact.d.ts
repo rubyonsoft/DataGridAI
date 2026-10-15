@@ -35,6 +35,11 @@ export interface AiGridReactProps extends AiGridReactEventProps {
     onError?: (error: Error) => void;
     /** Result of applying a new `rows` reference. Unsaved grid changes block the sync. */
     onRowsSync?: (result: AiGridApplyResult, grid: AiGridInstance) => void;
+    /**
+     * Result of applying changed `columns`, `options`, `rowKey` or remote `dataSource` to a live grid.
+     * Unsaved grid changes defer the rebuild (`reason: "dirty"`); it runs once they are accepted or rejected.
+     */
+    onConfigSync?: (result: AiGridApplyResult, grid: AiGridInstance) => void;
     renderError?: (error: Error) => ReactNode;
 }
 export declare const AiGridReact: import("react").ForwardRefExoticComponent<AiGridReactProps & import("react").RefAttributes<AiGridInstance>>;

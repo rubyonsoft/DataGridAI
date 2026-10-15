@@ -155,9 +155,9 @@
             }
         };
 
-        if (!window.XLSX) {
-            document.write('<script src="./assets/vendor/xlsx/xlsx.full.min.js?v=20260421r1"><\\/script>');
-        }
+        // xlsx-js-style (a SheetJS 0.18.5 fork) is kept only for styled export; parsing uses the bundled SheetJS.
+        if (window.XLSX) window.XLSXStyle = window.XLSX;
+        document.write('<script src="./assets/vendor/xlsx/xlsx.full.min.js?v=20261015r1"><\\/script>');
     </script>
     <style>
         .sunday { color: #fa5252 !important; font-weight: bold; }

@@ -3,7 +3,7 @@
 브라우저에서 동작하는 데이터 그리드입니다. 편집, 변경 추적, 검증, 정렬·필터·그룹, 대량 데이터 가상 스크롤, CSV/Excel 내보내기를 제공합니다.
 프레임워크 없이 `<script>` 태그로 쓰거나, 포함된 React 컴포넌트로 쓸 수 있습니다.
 
-- 버전: 0.2.1
+- 버전: 0.2.2
 - 라이선스: [AiGrid 무료 배포 라이선스](LICENSE.md). 상업적 이용을 포함해 무료로 쓸 수 있으며, AiGrid 자체를 유료로 판매하는 것은 금지됩니다.
 
 > **English summary.** AiGrid is a browser data grid with editing, change tracking, validation, sorting, filtering, grouping, virtual scrolling, and CSV/Excel export. Use it with plain `<script>` tags or the bundled React component. Free for personal and commercial use under the [AiGrid Freeware License](LICENSE.md); selling AiGrid itself is not permitted. Live examples: https://rubyon.azurewebsites.net/software/aigrid
@@ -130,7 +130,7 @@ python -m http.server 8080
 GitHub 저장소를 의존성으로 설치합니다(React 18 이상).
 
 ```bash
-npm install github:rubyonsoft/DataGridAI#v0.2.1
+npm install github:rubyonsoft/DataGridAI#v0.2.2
 ```
 
 ```tsx
@@ -168,7 +168,7 @@ export function EmployeeGrid() {
 
 - `rows`는 복사되어 그리드에 전달되므로 React 상태가 변경되지 않습니다.
 - 값이 다른 새 `rows`를 넘기면 그리드에 반영됩니다. `rowKey`가 있으면 선택과 스크롤을 유지한 채 바꿉니다. 저장하지 않은 편집이 있으면 반영하지 않고 `onRowsSync`로 알립니다.
-- `columns`, `options`의 값이 바뀌면 그리드를 다시 만듭니다. 함수(렌더러 등) 참조가 바뀌는 것만으로는 다시 만들지 않습니다.
+- `columns`, `options`의 값이 바뀌면 그리드를 다시 만듭니다. 함수(렌더러 등) 참조가 바뀌는 것만으로는 다시 만들지 않습니다. 저장하지 않은 편집이 있으면 다시 만들지 않고 `onConfigSync`로 알린 뒤, `acceptChanges()`나 `rejectChanges()` 후에 적용합니다.
 - 컴포넌트가 사라지면 그리드를 자동으로 정리합니다(StrictMode 포함).
 - 번들러 없이 런타임을 불러오려면 `loadAiGridRuntime({ scriptUrl, styleUrl })`를 사용합니다.
 
@@ -182,6 +182,7 @@ export function EmployeeGrid() {
 | `options` | 그 밖의 `createGrid()` 옵션 |
 | `runtime` | `window.AiGrid` 대신 쓸 런타임 |
 | `onReady`, `onError`, `onRowsSync` | 생성 완료, 오류, 행 반영 결과 |
+| `onConfigSync` | `columns`·`options` 변경 반영 결과(미저장 편집이 있으면 보류) |
 | `onDataChange`, `onSelectionChange`, `onQueryChange`, `onThemeChange` 등 | 그리드 이벤트 |
 
 ## 주요 옵션
@@ -207,12 +208,15 @@ export function EmployeeGrid() {
 |---|---|
 | `getDataRows()` | 현재 행 |
 | `insertRow(index, values)`, `deleteRow(index)` | 행 추가, 삭제 표시 |
-| `getChanges({ includeDeleted: true })` | 추가·수정·삭제 변경분 |
+| `getChanges({ includeDeleted: true, includeOriginal })` | 추가·수정·삭제 변경분(선택적으로 변경 전 값) |
 | `acceptChanges()`, `rejectChanges()` | 변경 확정, 취소 |
+| `saveChanges(url, { headers, credentials, transport })` | 변경분 저장. 인증 헤더나 직접 만든 HTTP 클라이언트 사용 |
 | `validateAll()` | 검증 오류 목록 |
 | `toggleSort()`, `setFilters()`, `setPage()`, `groupBy()` | 정렬, 필터, 페이지, 그룹 |
 | `replaceRows(rows)`, `updateRows(patches)` | 키 기반 데이터 교체·갱신(`rowKey` 필요) |
-| `exportToCsv(options)`, `exportToExcel(options)` | 내보내기. Excel은 SheetJS(`window.XLSX`)가 필요합니다 |
+| `editRows([{ key, values }])` | 변경 추적되는 일괄 편집(`rowKey` 필요) |
+| `importFromCsv(file, { mode })`, `importFromExcel(file, { mode })` | 가져오기. `mode`: `replace`, `append`, `upsert` |
+| `exportToCsv(options)`, `exportToExcel(options)` | 내보내기. Excel은 SheetJS(`window.XLSX`)가 필요합니다. 서식 내보내기 엔진은 `window.XLSXStyle`에 둘 수 있습니다 |
 | `setTheme(name)`, `getTheme()` | 테마 |
 | `on(eventName, handler)` | 이벤트 구독. 구독 해제 함수를 반환합니다 |
 | `destroy()` | 정리. 여러 번 호출해도 안전합니다 |

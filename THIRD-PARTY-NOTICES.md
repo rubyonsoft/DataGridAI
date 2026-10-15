@@ -11,12 +11,12 @@ Some files in this distribution include the open-source components below. Each c
 | react | 18.3.1 | MIT | `examples/react/assets/` |
 | react-dom | 18.3.1 | MIT | `examples/react/assets/` |
 | scheduler | 0.23.2 | MIT | `examples/react/assets/` |
-| xlsx | 0.18.5 | Apache-2.0 | `examples/react/assets/`, `examples/javascript/assets/vendor/xlsx/` |
-| @rollup/plugin-commonjs | vite 7.3.1 포함 | MIT | `examples/react/assets/` |
+| xlsx | 0.20.3 | Apache-2.0 | `examples/react/assets/`, `examples/javascript/assets/vendor/xlsx/` |
+| @rollup/plugin-commonjs | vite 7.3.7 포함 | MIT | `examples/react/assets/` |
 
 ## 포함되지 않고 실행 시 불러오는 외부 리소스
 
-- xlsx-js-style 1.2.0 (Apache-2.0): `examples/javascript/index.html`이 jsDelivr CDN에서 불러옵니다. 불러오지 못하면 포함된 SheetJS를 사용합니다.
+- xlsx-js-style 1.2.0 (Apache-2.0): `examples/javascript/index.html`이 jsDelivr CDN에서 불러와 스타일이 있는 Excel 내보내기(`window.XLSXStyle`)에만 씁니다. 가져오기와 파싱은 포함된 SheetJS를 사용하며, 불러오지 못하면 내보내기도 포함된 SheetJS로 합니다.
 - 국기 이미지(flagcdn.com): JavaScript 예제 데이터의 이미지 주소입니다.
 
 ## 라이선스 전문 (License Texts)
@@ -105,7 +105,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### xlsx 0.18.5 (Apache-2.0)
+### xlsx 0.20.3 (Apache-2.0)
 
 출처(Source): https://sheetjs.com/
 
@@ -313,7 +313,7 @@ Apache License
    limitations under the License.
 ```
 
-### @rollup/plugin-commonjs vite 7.3.1 포함 (MIT)
+### @rollup/plugin-commonjs vite 7.3.7 포함 (MIT)
 
 출처(Source): https://github.com/rollup/plugins
 

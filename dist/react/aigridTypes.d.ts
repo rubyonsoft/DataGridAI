@@ -37,6 +37,22 @@ export interface AiGridColumn {
     cellStyle?: AiGridStyleValue;
     colCss?: string | ((row: AiGridRow, column: AiGridColumn, rowIndex: number, colIndex: number, section: string) => string);
     validation?: AiGridValidationRule;
+    /** `check` columns: stored values (default `"T"`/`"F"`) and labels (default sample labels). */
+    trueValue?: unknown;
+    falseValue?: unknown;
+    trueLabel?: string;
+    falseLabel?: string;
+    /**
+     * Choices in display order for `radio`, `combo-master` and `combo-detail` columns. Detail choices carry
+     * `parent` (the master value). Without it the sample defaults (S/F/T, `grid.lists`) are used.
+     */
+    options?: Array<{
+        value: unknown;
+        label?: string;
+        parent?: unknown;
+    } | string | number>;
+    /** `combo-detail` columns: key of the `combo-master` column whose value filters the choices. */
+    parentKey?: string;
     /** Returned value is always rendered as text. */
     format?: (value: unknown, row: AiGridRow, column: AiGridColumn, rowIndex: number, grid: AiGridInstance) => unknown;
     /** Must return a DOM Node or DocumentFragment; HTML strings are rejected (0.1.1+). */
@@ -138,11 +154,34 @@ export interface AiGridColumnState {
 }
 export interface AiGridChangeSet {
     inserted: AiGridRow[];
+    /** `original` holds the values before the first edit of each dirty field (only with `includeOriginal`). */
     updated: Array<{
         row: AiGridRow;
         dirtyFields: string[];
+        original?: AiGridRow;
     }>;
     deleted: AiGridRow[];
+}
+export interface AiGridSaveOptions {
+    /** Plain object merged over `Content-Type: application/json`, e.g. auth or antiforgery headers. */
+    headers?: Record<string, string>;
+    credentials?: "omit" | "same-origin" | "include";
+    method?: string;
+    signal?: AbortSignal;
+    includeOriginal?: boolean;
+    /** Replaces `fetch`; resolve the server JSON. `{ ok: true }` accepts the changes. */
+    transport?: (changes: AiGridChangeSet, request: {
+        url: string;
+        signal?: AbortSignal;
+    }) => Promise<unknown>;
+}
+export type AiGridImportMode = "replace" | "append" | "upsert";
+export interface AiGridImportSummary {
+    mode: AiGridImportMode;
+    inserted: number;
+    updated: number;
+    unchanged: number;
+    skipped: number;
 }
 export interface AiGridValidationError {
     row: number;
@@ -189,6 +228,8 @@ export interface AiGridRowMoveResult {
 export interface AiGridDataChangeEvent {
     type: string;
     rows: AiGridRow[];
+    /** Present for `import-csv` and `import-excel`. */
+    import?: AiGridImportSummary;
 }
 export interface AiGridSelectionChangeEvent {
     activeCell: AiGridCellPosition;
@@ -309,11 +350,18 @@ export interface AiGridInstance {
     redo(): void;
     getChanges(options?: {
         includeDeleted?: boolean;
+        includeOriginal?: boolean;
     }): AiGridChangeSet;
     acceptChanges(): void;
     rejectChanges(): void;
     validateAll(): AiGridValidationError[];
-    saveChanges(url?: string): Promise<unknown>;
+    saveChanges(url?: string, options?: AiGridSaveOptions): Promise<unknown>;
+    /** Resolves the number of inserted plus updated rows. `upsert` requires `rowKey`. */
+    importFromCsv(file: Blob, options?: {
+        delimiter?: string;
+        hasHeader?: boolean;
+        mode?: AiGridImportMode;
+    }): Promise<number>;
     toggleSort(key: string, multi?: boolean): Promise<AiGridQueryResult | void>;
     setFilters(filters: AiGridFilter[]): Promise<AiGridQueryResult | void>;
     setFilterMode(mode: AiGridFilterMode): Promise<AiGridQueryResult | void>;
@@ -335,6 +383,11 @@ export interface AiGridInstance {
     applyColumnState(state: unknown): AiGridApplyResult;
     replaceRows(rows: AiGridRow[]): AiGridApplyResult;
     updateRows(updates: Array<{
+        key: AiGridRowKey;
+        values: AiGridRow;
+    }>): AiGridApplyResult;
+    /** Change-tracked edits of editable visible columns; throws without applying anything on an invalid edit. */
+    editRows(edits: Array<{
         key: AiGridRowKey;
         values: AiGridRow;
     }>): AiGridApplyResult;

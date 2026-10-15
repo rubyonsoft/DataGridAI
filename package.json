@@ -1,6 +1,6 @@
 {
   "name": "aigrid",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "AiGrid: browser JavaScript and React data grid with editing, change tracking, validation, sorting, filtering, grouping, tree, virtual scrolling and CSV/Excel export (freeware)",
   "keywords": [
     "data-grid",

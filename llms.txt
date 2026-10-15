@@ -1,17 +1,21 @@
 # AiGrid
 
-> AiGrid is a browser JavaScript data grid (editable data table, spreadsheet-like grid) for plain JavaScript and React. It provides cell editing with 12 column types, change tracking, validation, undo/redo, Excel-compatible copy and paste, sorting, filtering, grouping, tree grid, summary rows, client and server paging, virtual scrolling for 500,000+ rows, and CSV/Excel import and export. Version 0.2.1, freeware: free for personal and commercial use; selling AiGrid itself is not permitted.
+> AiGrid is a browser JavaScript data grid (editable data table, spreadsheet-like grid) for plain JavaScript and React. It provides cell editing with 12 column types, change tracking, validation, undo/redo, Excel-compatible copy and paste, sorting, filtering, grouping, tree grid, summary rows, client and server paging, virtual scrolling for 500,000+ rows, and CSV/Excel import and export. Version 0.2.2, freeware: free for personal and commercial use; selling AiGrid itself is not permitted.
 
 Key facts:
 
 - Load `dist/aigrid-core.min.css` and `dist/aigrid-core.min.js`, then call `await AiGrid.createGrid({ mount, columns, dataSource, features })`.
-- React: `import { AiGridReact } from "aigrid/react"` after `import "aigrid/core.css"; import "aigrid/core";`. Install with `npm install github:rubyonsoft/DataGridAI#v0.2.1`.
+- React: `import { AiGridReact } from "aigrid/react"` after `import "aigrid/core.css"; import "aigrid/core";`. Install with `npm install github:rubyonsoft/DataGridAI#v0.2.2`.
 - Column types: rowno, row-check, text, multitext, number, date, check, radio, combo-master, combo-detail, template (DOM node renderer), button.
-- Change tracking: `getChanges()` returns `{ inserted, updated: [{ row, dirtyFields }], deleted }`; `acceptChanges()` / `rejectChanges()`.
+- Change tracking: `getChanges({ includeDeleted, includeOriginal })` returns `{ inserted, updated: [{ row, dirtyFields, original? }], deleted }`; editor input, check/radio clicks and paste are tracked; reverting a value clears it; `acceptChanges()` (drops deleted rows) / `rejectChanges()`.
+- Saving: `saveChanges(url, { headers, credentials, transport })`. Tracked bulk edit: `editRows([{ key, values }])` (needs `rowKey`). Import modes: `importFromCsv/importFromExcel(file, { mode: "replace" | "append" | "upsert" })`.
+- `check` columns: `trueValue`/`falseValue`/`trueLabel`/`falseLabel`; `radio` columns: `options: [{ value, label }]`.
 - Validation: column `validation: { required, pattern, min, max, custom }`, `validateAll()`.
 - Data sources: local arrays, JSON URLs, server mode GET queries (`offset`, `limit`, `sort`, `filters`, `filterMode`), NDJSON, custom async `transport`.
 - Cell values are always rendered as text (no HTML injection); structured cells use `cellTemplate` returning DOM nodes.
-- Excel features require SheetJS (`window.XLSX`). Not included: charts, spreadsheet formulas, AI page builder.
+- Combo columns: `combo-master` `options: [{ value, label }]`; `combo-detail` `parentKey` + `options: [{ value, label, parent }]`.
+- Unsaved edits block filter changes (`{ status: "rejected", reason: "dirty" }`); accept/reject under a filter keeps hidden rows.
+- Excel features require SheetJS (`window.XLSX`); an optional styling writer such as xlsx-js-style goes in `window.XLSXStyle` and is used for export only. Not included: charts, spreadsheet formulas, AI page builder.
 
 ## Docs
 

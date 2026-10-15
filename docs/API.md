@@ -1,6 +1,6 @@
 # AiGrid API 레퍼런스
 
-AiGrid 0.2.1. 기능별 설명은 [FEATURES.md](FEATURES.md), TypeScript 타입은 `dist/react/aigridTypes.d.ts`를 참고하세요.
+AiGrid 0.2.2. 기능별 설명은 [FEATURES.md](FEATURES.md), TypeScript 타입은 `dist/react/aigridTypes.d.ts`를 참고하세요.
 
 ## 전역 객체 `window.AiGrid`
 
@@ -91,6 +91,9 @@ AiGrid 0.2.1. 기능별 설명은 [FEATURES.md](FEATURES.md), TypeScript 타입�
 | `className`, `colCss` | 클래스(문자열 또는 함수) |
 | `tooltip` | `{ caption, cell }` 각각 `{ template }` 또는 `{ renderer }` |
 | `mergeRow`, `mergeColumn` | 셀 병합 |
+| `trueValue`, `falseValue`, `trueLabel`, `falseLabel` | `check` 열의 저장 값(기본 `"T"`/`"F"`)과 표시 문구 |
+| `options` | `radio`·`combo-master`·`combo-detail` 열 선택지 `[{ value, label }]` 또는 `[value]`. 하위 콤보는 `parent`(상위 값) 포함 |
+| `parentKey` | `combo-detail` 열이 따르는 `combo-master` 열의 키 |
 | `captionMenu` | `false`면 이 열의 머리글 메뉴를 숨김 |
 
 ## 인스턴스 메서드
@@ -103,9 +106,9 @@ AiGrid 0.2.1. 기능별 설명은 [FEATURES.md](FEATURES.md), TypeScript 타입�
 | `getRowByDisplayIndex(index)` | 표시 순서의 행 |
 | `insertRow(index?, values?)` | 행 추가, 추가된 위치 반환 |
 | `deleteRow(index)` | 삭제 표시(다시 호출하면 취소) |
-| `getChanges({ includeDeleted })` | `{ inserted, updated: [{ row, dirtyFields }], deleted }` |
-| `acceptChanges()`, `rejectChanges()` | 변경 확정, 취소 |
-| `saveChanges(url)` | 변경분 POST 후 성공하면 확정 |
+| `getChanges({ includeDeleted, includeOriginal })` | `{ inserted, updated: [{ row, dirtyFields, original? }], deleted }` |
+| `acceptChanges()`, `rejectChanges()` | 변경 확정(삭제 표시 행 제거), 취소 |
+| `saveChanges(url, { headers, credentials, method, signal, includeOriginal, transport })` | 변경분 POST, 응답이 `{ ok: true }`면 확정 |
 | `validateAll()` | `[{ row, col, key, message }]` |
 | `findInvalid(afterRow?, afterColKey?)` | 다음 `validators` 오류 셀 |
 | `undo()`, `redo()` | 실행 취소, 다시 실행 |
@@ -135,8 +138,8 @@ AiGrid 0.2.1. 기능별 설명은 [FEATURES.md](FEATURES.md), TypeScript 타입�
 
 | 메서드 | 설명 |
 |---|---|
-| `exportToCsv(options)`, `importFromCsv(file, options)` | CSV |
-| `exportToExcel(options)`, `importFromExcel(fileOrOptions?, options?)`, `parseExcel(file, options)` | Excel(SheetJS 필요) |
+| `exportToCsv(options)`, `importFromCsv(file, { delimiter, hasHeader, mode })` | CSV. `mode`: `replace`(기본), `append`, `upsert`(`rowKey` 필요) |
+| `exportToExcel(options)`, `importFromExcel(fileOrOptions?, { mode, ... })`, `parseExcel(file, options)` | Excel(SheetJS 필요) |
 | `saveState(name)`, `loadState(name)`, `clearState(name)` | 상태 저장 |
 | `getColumnState()`, `applyColumnState(state)` | 열·정렬·필터 상태 JSON |
 
@@ -145,7 +148,8 @@ AiGrid 0.2.1. 기능별 설명은 [FEATURES.md](FEATURES.md), TypeScript 타입�
 | 메서드 | 설명 |
 |---|---|
 | `replaceRows(rows)` | 데이터 교체. 결과 `{ applied, rowCount }` 또는 `{ applied: false, reason }` |
-| `updateRows([{ key, values }])` | 일부 행 갱신 |
+| `updateRows([{ key, values }])` | 서버 기준 일부 행 갱신(미저장 편집이 있으면 거부, 변경 추적 안 함) |
+| `editRows([{ key, values }])` | 변경 추적되는 일괄 편집. 결과 `{ applied, rowCount }`, 잘못된 편집이 있으면 아무것도 바꾸지 않고 예외 |
 | `getSelectedKeys()`, `setSelectedKeys(keys)` | 선택 행 키 |
 | `requestRowMove(key, beforeKey)` | 행 이동 요청 |
 | `getExpandedKeys()`, `setExpandedKeys(keys)`, `setTreeExpanded(key, expanded)`, `cancelTreeLoad(key?)`, `focusTreeRow(key)` | 관리형 트리 |
@@ -168,7 +172,7 @@ AiGrid 0.2.1. 기능별 설명은 [FEATURES.md](FEATURES.md), TypeScript 타입�
 
 | 이벤트 | 데이터 |
 |---|---|
-| `dataChange` | `{ type, rows }` (`type`: `edit-cell`, `paste`, `add-row`, `add-row-top`, `insert-row`, `delete-row`, `row-drag`, `row-move`, `import-csv`, `import-excel`, `replace-rows`, `update-rows`) |
+| `dataChange` | `{ type, rows }` (`type`: `edit-cell`, `check-toggle`, `radio-change`, `paste`, `edit-rows`, `add-row`, `add-row-top`, `insert-row`, `delete-row`, `row-drag`, `row-move`, `import-csv`, `import-excel`, `replace-rows`, `update-rows`). 가져오기는 `import: { mode, inserted, updated, unchanged, skipped }` 포함 |
 | `selectionChange` | `{ activeCell, ranges, selectedKeys?, currentKey? }` |
 | `queryChange` | `{ reason, query, generation }` |
 | `queryError` | `{ generation, error }` |
@@ -197,6 +201,7 @@ import { AiGridReact, loadAiGridRuntime, type AiGridInstance } from "aigrid/reac
 | `ref` | `AiGridInstance` (생성 전·해제 후 `null`) |
 | `onReady(grid)`, `onError(error)` | 생성 완료, 오류 |
 | `onRowsSync(result, grid)` | 새 `rows` 반영 결과 |
+| `onConfigSync(result, grid)` | `columns`·`options`·`rowKey` 변경 반영 결과. 미저장 편집이 있으면 `{ applied: false, reason: "dirty" }`로 보류하고, 확정·취소 후 적용 |
 | `onDataChange` 외 이벤트 prop | `(event, grid)` 형식, 위 이벤트와 같음 |
 | `renderError(error)` | 오류 표시 사용자 정의 |
 

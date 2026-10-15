@@ -1,6 +1,6 @@
 # AiGrid 기능 설명 (Features)
 
-AiGrid 0.2.1은 브라우저에서 동작하는 JavaScript 데이터 그리드입니다. 프레임워크 없이 `<script>` 태그로 쓰거나 React 컴포넌트 `AiGridReact`로 씁니다.
+AiGrid 0.2.2은 브라우저에서 동작하는 JavaScript 데이터 그리드입니다. 프레임워크 없이 `<script>` 태그로 쓰거나 React 컴포넌트 `AiGridReact`로 씁니다.
 이 문서는 기능별로 무엇을 할 수 있는지와 해당 옵션·메서드 이름을 정리합니다. 전체 시그니처는 [API.md](API.md)를 보세요.
 
 > **English summary.** AiGrid is a browser JavaScript data grid (data table / spreadsheet-like editable grid) for plain JavaScript and React. Features: cell editing with 12 column types, change tracking (inserted/updated/deleted), validation, undo/redo, Excel-compatible copy & paste, range selection, multi-column sorting, filtering with 20+ operators and AND/OR, caption (column header) menu, row filter, column resize/hide/pin, frozen columns, sticky header/footer/rows, header groups, cell merge, grouping with drag & drop, tree grid with lazy loading, summary rows, client and server paging, server mode with sort/filter query and NDJSON, virtual scrolling for 500,000+ rows, CSV import/export, Excel import/export (SheetJS), state save/restore, themes, keyboard navigation and accessibility, and safe (text-only) cell rendering.
@@ -53,9 +53,9 @@ AiGrid 0.2.1은 브라우저에서 동작하는 JavaScript 데이터 그리드�
 | `multitext` | 여러 줄 텍스트 |
 | `number` | 숫자. `format`으로 표시 형식 지정 |
 | `date` | 날짜 |
-| `check` | 체크 값(`"T"` / `"F"`) |
-| `radio` | 라디오 선택 |
-| `combo-master` / `combo-detail` | 상위 값에 따라 하위 목록이 바뀌는 연동 콤보 |
+| `check` | 체크 값(기본 `"T"` / `"F"`). `trueValue`, `falseValue`, `trueLabel`, `falseLabel`로 값과 표시 문구 지정 |
+| `radio` | 라디오 선택. `options: [{ value, label }]`로 선택지 지정 |
+| `combo-master` / `combo-detail` | 상위 값에 따라 하위 목록이 바뀌는 연동 콤보. 상위 열에 `options: [{ value, label }]`, 하위 열에 `parentKey`와 `options: [{ value, label, parent }]`를 지정합니다. 상위 값이 바뀌면 하위 값은 첫 선택지로 바뀝니다 |
 | `template` | `cellTemplate`가 반환하는 DOM 노드로 그리는 셀(이미지, 배지 등) |
 | `button` | 셀 안의 편집·삭제 버튼 |
 
@@ -66,10 +66,17 @@ AiGrid 0.2.1은 브라우저에서 동작하는 JavaScript 데이터 그리드�
 - 셀을 더블클릭하거나 Enter로 편집합니다. Enter로 저장(멀티텍스트 제외)하고 Esc로 취소하며, 편집기 밖을 누르면 저장합니다.
 - 툴바 버튼: `toolBar: { left: ["add", "addTop", "insert", "delete", "undelete", "undo", "redo", "excelImport", "excelExport", "captionFilter", "rowFilter"] }`
 - 행 추가·삭제 API: `insertRow(index, values)`, `deleteRow(index)`(삭제 표시, 한 번 더 호출하면 취소)
-- **변경 추적:** 행마다 추가(I)·수정(U)·삭제(D) 상태와 바뀐 필드를 기록합니다.
+- **변경 추적:** 행마다 추가(I)·수정(U)·삭제(D) 상태와 바뀐 필드를 기록합니다. 편집기 입력, `check`·`radio` 셀 클릭, Ctrl+V 붙여넣기가 모두 추적됩니다(`row-check` 행 선택은 제외).
   - `getChanges({ includeDeleted: true })` → `{ inserted, updated: [{ row, dirtyFields }], deleted }`
-  - `acceptChanges()`로 확정하고 `rejectChanges()`로 원래대로 되돌립니다.
-  - `saveChanges(url)`는 변경분을 POST하는 간단한 저장 함수입니다.
+  - `getChanges({ includeOriginal: true })`는 수정 행에 변경 전 값 `original: { 필드: 값 }`을 더합니다. 서버의 동시성 검사나 감사 기록에 씁니다.
+  - 값을 원래대로 되돌리면 그 필드의 수정 표시가 풀리고, 남은 변경이 없으면 행도 수정 상태에서 빠집니다.
+  - `acceptChanges()`로 확정하고(삭제 표시 행은 목록에서 제거) `rejectChanges()`로 원래대로 되돌립니다.
+  - `saveChanges(url, options)`는 변경분을 POST하고 서버가 `{ ok: true }`를 돌려주면 확정합니다. `options`: `headers`(인증·위조 방지 토큰), `credentials`, `method`, `signal`, `includeOriginal`, `transport(changes, { url })`(직접 만든 HTTP 클라이언트 사용).
+- **일괄 편집:** `editRows([{ key, values }])`는 사용자가 입력한 것과 같이 변경 추적되는 편집입니다(`rowKey` 필요). 선택한 행에 같은 값을 넣을 때 씁니다.
+  ```js
+  grid.editRows(grid.getSelectedKeys().map(key => ({ key, values: { apptDate: "2026-11-01" } })));
+  ```
+  편집 가능한 표시 열만 바꿀 수 있고, 하나라도 잘못되면(없는 키, 읽기 전용 열, 삭제 표시 행) 아무것도 바꾸지 않고 예외를 던집니다. 편집이 꺼진 그리드는 `{ applied: false, reason: "readonly" }`를 돌려줍니다.
 - **실행 취소·다시 실행:** `features.undoRedo`, `undo()`, `redo()`, Ctrl+Z / Ctrl+Y, `history: { max }`
 - 권장 저장 흐름: `validateAll()` → `getChanges()`를 서버로 전송 → 성공하면 `acceptChanges()` → 서버가 돌려준 행으로 다시 표시
 
@@ -141,8 +148,10 @@ AiGrid 0.2.1은 브라우저에서 동작하는 JavaScript 데이터 그리드�
 
 ## 12. 가져오기·내보내기 (CSV, Excel)
 
-- CSV: `exportToCsv({ filename, delimiter, includeHeader, includeBom, quoteAll })`, `importFromCsv(file, { delimiter, hasHeader })`
-- Excel 내보내기·가져오기: `exportToExcel({ fileName, sheetName, ... })`, `importFromExcel()`. SheetJS(`window.XLSX`)가 필요합니다.
+- CSV: `exportToCsv({ filename, delimiter, includeHeader, includeBom, quoteAll })`, `importFromCsv(file, { delimiter, hasHeader, mode })`
+- Excel 내보내기·가져오기: `exportToExcel({ fileName, sheetName, ... })`, `importFromExcel(file, { mode, ... })`. SheetJS(`window.XLSX`)가 필요합니다.
+- 셀 서식이 있는 내보내기 엔진(예: xlsx-js-style)은 `window.XLSXStyle`로 두면 내보내기에만 쓰고, 가져오기와 파싱은 항상 `window.XLSX`를 씁니다. 오래된 포크로 사용자 파일을 읽지 않도록 `window.XLSX`에는 최신 SheetJS를 두세요.
+- 가져오기 `mode`: `"replace"`(기본, 가져온 행으로 목록을 바꾸고 모두 추가 상태), `"append"`(뒤에 추가), `"upsert"`(`rowKey` 필요. 키가 같은 행은 편집 가능한 열만 수정으로 기록하고, 새 키는 추가하며, 키가 없거나 삭제 표시된 행은 건너뜀). 결과 요약은 `dataChange` 이벤트의 `import: { mode, inserted, updated, unchanged, skipped }`로 받습니다.
 - 안전한 Excel 읽기: `AiGrid.parseExcel(file, { columns, formulaPolicy, limits })`는 열 타입별로 값을 변환하고 행·셀 수 제한과 수식 정책(`reject`, `cached-value`)을 적용합니다.
 
 ## 13. 상태 저장과 키 기반 API
@@ -194,7 +203,7 @@ import { AiGridReact } from "aigrid/react";
 
 - `ref`로 그리드 인스턴스를 받아 위의 모든 메서드를 씁니다.
 - `rows`는 복사해서 전달하므로 React 상태가 변경되지 않습니다. 값이 다른 새 `rows`는 그리드에 반영하고(`rowKey`가 있으면 `replaceRows`), 저장하지 않은 편집이 있으면 반영하지 않고 `onRowsSync`로 알립니다.
-- `columns`·`options`는 값이 바뀔 때만 그리드를 다시 만듭니다. 렌더러 같은 함수 참조 변경으로는 다시 만들지 않습니다.
+- `columns`·`options`는 값이 바뀔 때만 그리드를 다시 만듭니다. 렌더러 같은 함수 참조 변경으로는 다시 만들지 않습니다. 저장하지 않은 편집이 있으면 다시 만들지 않고 `onConfigSync`로 알린 뒤, `acceptChanges()`나 `rejectChanges()` 후에 적용합니다.
 - StrictMode에서도 그리드가 하나만 생성되고, 컴포넌트가 사라질 때 자동으로 정리됩니다.
 - 이벤트 prop: `onDataChange`, `onSelectionChange`, `onQueryChange`, `onQueryError`, `onRender`, `onThemeChange`, `onTreeLoad`, `onTreeExpansionChange`, `onRowMoveRequest`
 - TypeScript 타입이 포함되어 있습니다(`AiGridColumn`, `AiGridInstance`, `AiGridOptions` 등).
@@ -202,7 +211,8 @@ import { AiGridReact } from "aigrid/react";
 ## 18. 제한 사항
 
 - Excel 기능은 SheetJS(`window.XLSX`)를 따로 불러와야 합니다.
-- `check` 열은 `"T"`/`"F"` 값을 씁니다. 클릭 토글 값은 현재 `getChanges()` 변경 추적에 포함되지 않습니다.
-- `radio` 열과 연동 콤보(`combo-master`/`combo-detail`)의 선택지 구조는 현재 런타임에 고정된 형식을 씁니다. 콤보 목록은 `grid.lists = { continentData, nationData }`로 지정합니다.
-- `acceptChanges()`는 삭제 표시 행을 목록에서 제거하지 않습니다. 저장 후 서버가 돌려준 행으로 다시 표시하세요.
+- 붙여넣기는 텍스트를 그대로 저장합니다(`1,234`를 숫자로 바꾸지 않음). 서버에서 형식을 검증하세요.
+- 저장하지 않은 편집이 있으면 필터 변경이 거부됩니다(`{ status: "rejected", reason: "dirty" }`). 저장하거나 취소한 뒤 필터를 바꾸세요. 필터가 걸린 상태에서 확정·취소해도 화면에 보이지 않는 행은 유지됩니다.
+- 연동 콤보에 `options`를 지정하지 않으면 예제용 `grid.lists = { continentData, nationData }` 형식을 씁니다.
+- 가져오기 `replace` 모드는 기존 행을 삭제로 기록하지 않습니다. 기존 데이터에 반영하려면 `upsert`를 쓰세요.
 - 차트, 스프레드시트 수식, AI 페이지 빌더는 이 무료 배포판에 포함되지 않습니다.
